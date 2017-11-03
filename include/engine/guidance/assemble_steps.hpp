@@ -127,7 +127,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                 // intersections contain the classes of exiting road
                 intersection.classes = facade.GetClasses(path_point.classes);
 
-                steps.push_back(RouteStep{step_name_id,
+                steps.push_back(RouteStep{path_point.from_edge_based_node,
+                                          step_name_id,
                                           is_segregated,
                                           name.to_string(),
                                           ref.to_string(),
@@ -144,7 +145,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                           leg_geometry.FrontIndex(segment_index),
                                           leg_geometry.BackIndex(segment_index) + 1,
                                           {intersection},
-                                          path_point.is_left_hand_driving});
+                                          path_point.is_left_hand_driving,
+                                          false});
 
                 if (leg_data_index + 1 < leg_data.size())
                 {
@@ -209,7 +211,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
         // intersections contain the classes of exiting road
         intersection.classes = facade.GetClasses(facade.GetClassData(target_node_id));
         BOOST_ASSERT(duration >= 0);
-        steps.push_back(RouteStep{step_name_id,
+        steps.push_back(RouteStep{leg_data[leg_data.size() - 1].from_edge_based_node,
+                                  step_name_id,
                                   is_segregated,
                                   facade.GetNameForID(step_name_id).to_string(),
                                   facade.GetRefForID(step_name_id).to_string(),
@@ -226,7 +229,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                   leg_geometry.FrontIndex(segment_index),
                                   leg_geometry.BackIndex(segment_index) + 1,
                                   {intersection},
-                                  facade.IsLeftHandDriving(target_node_id)});
+                                  facade.IsLeftHandDriving(target_node_id),
+                                  false});
     }
     // In this case the source + target are on the same edge segment
     else
@@ -253,7 +257,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
         BOOST_ASSERT(target_duration >= source_duration || weight == 0);
         const EdgeWeight duration = std::max(0, target_duration - source_duration);
 
-        steps.push_back(RouteStep{source_name_id,
+        steps.push_back(RouteStep{source_node_id,
+                                  source_name_id,
                                   is_segregated,
                                   facade.GetNameForID(source_name_id).to_string(),
                                   facade.GetRefForID(source_name_id).to_string(),
@@ -270,7 +275,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                   leg_geometry.FrontIndex(segment_index),
                                   leg_geometry.BackIndex(segment_index) + 1,
                                   {intersection},
-                                  facade.IsLeftHandDriving(source_node_id)});
+                                  facade.IsLeftHandDriving(source_node_id),
+                                  false});
     }
 
     BOOST_ASSERT(segment_index == number_of_segments - 1);
@@ -295,7 +301,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                 0};
 
     BOOST_ASSERT(!leg_geometry.locations.empty());
-    steps.push_back(RouteStep{target_name_id,
+    steps.push_back(RouteStep{target_node_id,
+                              target_name_id,
                               facade.IsSegregated(target_node_id),
                               facade.GetNameForID(target_name_id).to_string(),
                               facade.GetRefForID(target_name_id).to_string(),
@@ -312,7 +319,8 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                               leg_geometry.locations.size() - 1,
                               leg_geometry.locations.size(),
                               {intersection},
-                              facade.IsLeftHandDriving(target_node_id)});
+                              facade.IsLeftHandDriving(target_node_id),
+                              false});
 
     BOOST_ASSERT(steps.front().intersections.size() == 1);
     BOOST_ASSERT(steps.front().intersections.front().bearings.size() == 1);

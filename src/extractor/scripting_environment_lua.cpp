@@ -7,6 +7,7 @@
 #include "extractor/extraction_turn.hpp"
 #include "extractor/extraction_way.hpp"
 #include "extractor/internal_extractor_edge.hpp"
+#include "extractor/maneuver_override_relation_parser.hpp"
 #include "extractor/profile_properties.hpp"
 #include "extractor/query_node.hpp"
 #include "extractor/raster_source.hpp"
@@ -399,8 +400,8 @@ void Sol2ScriptingEnvironment::InitContext(LuaScriptingContext &context)
         "get_relations",
         [&getTypedRefBySol](ExtractionRelationContainer &cont, const sol::object &obj)
             -> const ExtractionRelationContainer::RelationIDList & {
-                return cont.GetRelations(getTypedRefBySol(obj));
-            },
+            return cont.GetRelations(getTypedRefBySol(obj));
+        },
         "relation",
         [](ExtractionRelationContainer &cont, const ExtractionRelation::OsmIDTyped &rel_id)
             -> const ExtractionRelation & { return cont.GetRelationData(rel_id); });
@@ -836,10 +837,12 @@ LuaScriptingContext &Sol2ScriptingEnvironment::GetSol2Context()
 void Sol2ScriptingEnvironment::ProcessElements(
     const osmium::memory::Buffer &buffer,
     const RestrictionParser &restriction_parser,
+    const ManeuverOverrideRelationParser &maneuver_override_parser,
     const ExtractionRelationContainer &relations,
     std::vector<std::pair<const osmium::Node &, ExtractionNode>> &resulting_nodes,
     std::vector<std::pair<const osmium::Way &, ExtractionWay>> &resulting_ways,
-    std::vector<InputConditionalTurnRestriction> &resulting_restrictions)
+    std::vector<InputConditionalTurnRestriction> &resulting_restrictions,
+    std::vector<InputManeuverOverride> &resulting_maneuver_overrides)
 {
     ExtractionNode result_node;
     ExtractionWay result_way;
@@ -878,6 +881,10 @@ void Sol2ScriptingEnvironment::ProcessElements(
             if (auto result_res = restriction_parser.TryParse(relation))
             {
                 resulting_restrictions.push_back(*result_res);
+            }
+            else if (auto result_res = maneuver_override_parser.TryParse(relation))
+            {
+                resulting_maneuver_overrides.push_back(*result_res);
             }
         }
         break;

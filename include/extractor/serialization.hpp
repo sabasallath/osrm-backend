@@ -4,6 +4,7 @@
 #include "conditional_turn_penalty.hpp"
 #include "extractor/datasources.hpp"
 #include "extractor/intersection_bearings_container.hpp"
+#include "extractor/maneuver_override.hpp"
 #include "extractor/nbg_to_ebg.hpp"
 #include "extractor/node_data_container.hpp"
 #include "extractor/profile_properties.hpp"
@@ -297,6 +298,34 @@ inline void read(storage::io::FileReader &reader,
     conditional_penalties.resize(num_elements);
     for (auto &penalty : conditional_penalties)
         read(reader, penalty);
+}
+
+// inline void read(storage::io::FileReader &reader,
+//                  std::vector<ManeuverOverride> &maneuver_overrides,
+//                  std::vector<NodeID> &node_sequences)
+// {
+//     auto const num_elements = reader.ReadElementCount64();
+//     auto const num_nodes = reader.ReadElementCount64();
+//     maneuver_overrides.resize(num_elements);
+//     node_sequences.resize(num_nodes);
+
+//     std::cout << "###### Reading " << maneuver_overrides.size() << " overrides, and "
+//               << node_sequences.size() << " sequence points" << std::endl;
+
+//     reader.ReadInto(maneuver_overrides);
+//     reader.ReadInto(node_sequences);
+// }
+
+inline void write(storage::io::FileWriter &writer,
+                  const std::vector<StorageManeuverOverride> &maneuver_overrides,
+                  const std::vector<NodeID> &node_sequences)
+{
+    std::cout << "###### Writing " << maneuver_overrides.size() << " overrides, and "
+              << node_sequences.size() << " sequence points" << std::endl;
+    writer.WriteElementCount64(maneuver_overrides.size());
+    writer.WriteElementCount64(node_sequences.size());
+    writer.WriteFrom(maneuver_overrides);
+    writer.WriteFrom(node_sequences);
 }
 }
 }
