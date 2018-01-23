@@ -27,7 +27,6 @@
 #include <limits>
 #include <mutex>
 #include <sstream>
-#include <tuple>
 
 namespace
 {
@@ -142,6 +141,7 @@ void ExtractionContainers::PrepareData(ScriptingEnvironment &scripting_environme
     WriteEdges(file_out);
     WriteMetadata(file_out);
 
+    /* Sort these so that searching is a bit faster later on */
     {
         util::UnbufferedLog log;
         log << "Sorting used ways         ... ";

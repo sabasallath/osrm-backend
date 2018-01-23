@@ -1083,6 +1083,6 @@ Feature: Car - Turn restrictions
             | restriction | bd       | abc    | b        | no_left_turn |
 
         When I route I should get
-            | from | to | route              |
-            | d    | x  | ab,bc,bc,bge,de,de |
-            | d    | z  | ab,bc,bc,bge,de,de |
+            | from | to | route        |
+            | d    | x  | bd,abc,xa,xa |
+            | d    | z  | bd,abc,cz,cz |

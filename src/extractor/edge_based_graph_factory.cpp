@@ -1055,6 +1055,8 @@ void EdgeBasedGraphFactory::GenerateEdgeExpandedEdges(
                                generator_stage & processor_stage & output_stage);
 
         // NOTE: buffer.delayed_data and buffer.delayed_turn_data have the same index
+        std::for_each(delayed_data.begin(), delayed_data.end(), transfer_data);
+
         // Now, replace node-based-node ID values in the `node_sequence` with
         // the edge-based-node values we found and stored in the `turn_to_ebn_map`
         for (auto &unresolved_override : unresolved_maneuver_overrides)
@@ -1102,10 +1104,6 @@ void EdgeBasedGraphFactory::GenerateEdgeExpandedEdges(
 
             storage_maneuver_overrides.push_back(storage_override);
         }
-
-        std::sort(delayed_data.begin(), delayed_data.end(), [](auto const &lhs, auto const &rhs) {
-            return lhs.edge.source < rhs.edge.source;
-        });
 
         // Flush the turn_indexes_write_buffer if it's not empty
         if (!turn_indexes_write_buffer.empty())
