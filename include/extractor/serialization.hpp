@@ -300,22 +300,6 @@ inline void read(storage::io::FileReader &reader,
         read(reader, penalty);
 }
 
-// inline void read(storage::io::FileReader &reader,
-//                  std::vector<ManeuverOverride> &maneuver_overrides,
-//                  std::vector<NodeID> &node_sequences)
-// {
-//     auto const num_elements = reader.ReadElementCount64();
-//     auto const num_nodes = reader.ReadElementCount64();
-//     maneuver_overrides.resize(num_elements);
-//     node_sequences.resize(num_nodes);
-
-//     std::cout << "###### Reading " << maneuver_overrides.size() << " overrides, and "
-//               << node_sequences.size() << " sequence points" << std::endl;
-
-//     reader.ReadInto(maneuver_overrides);
-//     reader.ReadInto(node_sequences);
-// }
-
 inline void write(storage::io::FileWriter &writer,
                   const std::vector<StorageManeuverOverride> &maneuver_overrides,
                   const std::vector<NodeID> &node_sequences)
