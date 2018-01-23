@@ -289,13 +289,14 @@ class RouteAPI : public BaseAPI
                                 if (maneuver_relation.direction !=
                                     osrm::guidance::DirectionModifier::MaxDirectionModifier)
                                 {
-                                    std::cout
-                                        << "    direction was "
-                                        << osrm::guidance::instructionModifierToString(
-                                            step_to_update->maneuver.instruction.direction_modifier)
-                                        << " now " << osrm::guidance::instructionModifierToString(
-                                                          maneuver_relation.direction)
-                                        << std::endl;
+                                    std::cout << "    direction was "
+                                              << osrm::guidance::instructionModifierToString(
+                                                     step_to_update->maneuver.instruction
+                                                         .direction_modifier)
+                                              << " now "
+                                              << osrm::guidance::instructionModifierToString(
+                                                     maneuver_relation.direction)
+                                              << std::endl;
                                     step_to_update->maneuver.instruction.direction_modifier =
                                         maneuver_relation.direction;
                                 }

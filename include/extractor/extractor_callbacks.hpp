@@ -93,7 +93,7 @@ class ExtractorCallbacks
     void ProcessWay(const osmium::Way &current_way, const ExtractionWay &result_way);
 
     // warning: caller needs to take care of synchronization!
-    void ProcessManeuverOverride(const InputManeuverOverride &override);
+    void ProcessManeuverOverride(const InputManeuverOverride & override);
 };
 }
 }
