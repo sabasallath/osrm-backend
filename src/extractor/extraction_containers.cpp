@@ -793,12 +793,6 @@ void ExtractionContainers::PrepareManeuverOverrides()
         auto result =
             find_turn_from_way_tofrom_nodes(from_segment_itr->second, to_segment_itr->second);
 
-        std::cout << "Turn from " << from_segment_itr->second.way_id << " to  "
-                  << to_segment_itr->second.way_id << std::endl;
-
-        std::cout << "  traverses nodes from " << result.from << " via " << result.via << " to "
-                  << result.to << std::endl;
-
         return result;
     };
 

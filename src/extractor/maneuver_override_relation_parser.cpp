@@ -24,12 +24,9 @@ namespace extractor
 ManeuverOverrideRelationParser::ManeuverOverrideRelationParser() {}
 
 /**
- * Tries to parse a relation as a turn restriction. This can fail for a number of
- * reasons. The return type is a boost::optional<T>.
- *
- * Some restrictions can also be ignored: See the ```get_restrictions``` function
- * in the corresponding profile. We use it for both namespacing restrictions, as in
- * restriction:motorcar as well as whitelisting if its in except:motorcar.
+ * Parses the `type=maneuver` relation.  Reads the fields, and puts data
+ * into an InputManeuverOverride object, if the relation is considered
+ * valid (i.e. has the minimum tags we expect).
  */
 boost::optional<InputManeuverOverride>
 ManeuverOverrideRelationParser::TryParse(const osmium::Relation &relation) const
@@ -54,9 +51,6 @@ ManeuverOverrideRelationParser::TryParse(const osmium::Relation &relation) const
 
     maneuver_override.maneuver = relation.tags().get_value_by_key("maneuver", "");
     maneuver_override.direction = relation.tags().get_value_by_key("direction", "");
-
-    std::cout << "maneuver " << maneuver_override.maneuver << std::endl;
-    std::cout << "direction " << maneuver_override.direction << std::endl;
 
     boost::optional<std::uint64_t> from = boost::none, via = boost::none, to = boost::none;
     std::vector<std::uint64_t> via_ways;
@@ -119,7 +113,6 @@ ManeuverOverrideRelationParser::TryParse(const osmium::Relation &relation) const
         }
         for (const auto &n : via_ways)
         {
-            std::cout << "Adding via way: " << n << std::endl;
             maneuver_override.via_ways.push_back(OSMWayID{n});
         }
     }

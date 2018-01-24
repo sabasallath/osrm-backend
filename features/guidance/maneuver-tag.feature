@@ -33,10 +33,6 @@ Feature: Maneuver tag support
         # Testing directly connected from/to 
             | a,j       | A Street,C Street,J Street,J Street | depart,turn sharp right,turn left,arrive |
             | b,g       | A Street,C Street,C Street          | depart,turn sharp right,arrive           |
-        # Testing disconnected via ways (first turn is only modified if you end up
-        # on a particular way)
-        #    | h,a       | J Street,C Street,A Street,A Street | depart,turn left,turn left,arrive        |
-        #    | h,e       | J Street,C Street,B Street,B Street | depart,turn sharp left,turn left,arrive  |
         # Testing re-awakening suppressed turns
             | a,e       | A Street,B Street,B Street          | depart,turn slight left,arrive           |
 

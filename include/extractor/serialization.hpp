@@ -304,8 +304,6 @@ inline void write(storage::io::FileWriter &writer,
                   const std::vector<StorageManeuverOverride> &maneuver_overrides,
                   const std::vector<NodeID> &node_sequences)
 {
-    std::cout << "###### Writing " << maneuver_overrides.size() << " overrides, and "
-              << node_sequences.size() << " sequence points" << std::endl;
     writer.WriteElementCount64(maneuver_overrides.size());
     writer.WriteElementCount64(node_sequences.size());
     writer.WriteFrom(maneuver_overrides);

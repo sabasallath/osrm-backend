@@ -916,20 +916,17 @@ class ContiguousInternalMemoryDataFacadeBase : public BaseDataFacade
     {
         std::vector<extractor::ManeuverOverride> results;
 
-        bool found = false;
-        // Copy all the overrides into the results array.
-        // m_maneuver_overrides is sorted by node_sequence.front(),
-        // so we can stop searching after we get to a node > edge_based_node_id
-        for (const auto & override : m_maneuver_overrides)
+        // heterogeneous comparison:
+        struct Comp
         {
-            if (found && override.start_node != edge_based_node_id)
-                break;
+            bool operator() ( const extractor::StorageManeuverOverride& s, NodeID i ) const { return s.start_node < i; }
+            bool operator() ( NodeID i, const extractor::StorageManeuverOverride& s ) const { return i < s.start_node; }
+        };
 
-            if (override.start_node == edge_based_node_id)
-            {
-                std::cout << "Found start node " << override.start_node << std::endl;
-                std::cout << "Copying from " << override.node_sequence_offset_begin << " to "
-                          << override.node_sequence_offset_end << std::endl;
+        auto found_range = std::equal_range(m_maneuver_overrides.begin(), m_maneuver_overrides.end(),
+        edge_based_node_id, Comp{});
+
+        std::for_each(found_range.first, found_range.second, [&](const auto &override) {
                 std::vector<NodeID> sequence(m_maneuver_override_node_sequences.begin() +
                                                  override.node_sequence_offset_begin,
                                              m_maneuver_override_node_sequences.begin() +
@@ -938,11 +935,9 @@ class ContiguousInternalMemoryDataFacadeBase : public BaseDataFacade
                                                               override.instruction_node,
                                                               override.override_type,
                                                               override.direction});
-                found = true;
-            }
-        }
-
+        });
         return results;
+
     }
 };
 

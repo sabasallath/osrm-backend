@@ -107,24 +107,24 @@ class RouteAPI : public BaseAPI
     {
         for (const auto &a : unpacked_path_segments)
         {
-            std::cout << "Route: ";
-            std::cout << (source_traversed_in_reverse[0]
+            util::Log(logDEBUG) << "Route: ";
+            util::Log(logDEBUG) << (source_traversed_in_reverse[0]
                               ? segment_end_coordinates[0].source_phantom.reverse_segment_id.id
                               : segment_end_coordinates[0].source_phantom.forward_segment_id.id)
                       << " ";
             for (const auto &b : a)
             {
-                std::cout << "(";
-                std::cout << b.from_edge_based_node << " ";
-                std::cout << static_cast<int>(b.turn_instruction.type) << " ";
-                std::cout << static_cast<int>(b.turn_instruction.direction_modifier) << ") ";
+                util::Log(logDEBUG) << "(";
+                util::Log(logDEBUG) << b.from_edge_based_node << " ";
+                util::Log(logDEBUG) << static_cast<int>(b.turn_instruction.type) << " ";
+                util::Log(logDEBUG) << static_cast<int>(b.turn_instruction.direction_modifier) << ") ";
             }
-            std::cout << (target_traversed_in_reverse[0]
+            util::Log(logDEBUG) << (target_traversed_in_reverse[0]
                               ? segment_end_coordinates[0].target_phantom.reverse_segment_id.id
                               : segment_end_coordinates[0].target_phantom.forward_segment_id.id)
                       << " ";
 
-            std::cout << std::endl;
+            util::Log(logDEBUG) << std::endl;
         }
         std::vector<guidance::RouteLeg> legs;
         std::vector<guidance::LegGeometry> leg_geometries;
@@ -154,7 +154,7 @@ class RouteAPI : public BaseAPI
                                              reversed_target,
                                              parameters.steps);
 
-            std::cout << "Assembling steps " << std::endl;
+            util::Log(logDEBUG) << "Assembling steps " << std::endl;
             if (parameters.steps)
             {
                 auto steps = guidance::assembleSteps(BaseAPI::facade,
@@ -171,35 +171,35 @@ class RouteAPI : public BaseAPI
                 for (auto current_step_it = steps.begin(); current_step_it != steps.end();
                      ++current_step_it)
                 {
-                    std::cout << "Searching for " << current_step_it->from_id << std::endl;
+                    util::Log(logDEBUG) << "Searching for " << current_step_it->from_id << std::endl;
                     const auto overrides =
                         BaseAPI::facade.GetOverridesThatStartAt(current_step_it->from_id);
                     if (overrides.empty())
                         continue;
-                    std::cout << "~~~~ GOT A HIT, checking the rest ~~~" << std::endl;
+                    util::Log(logDEBUG) << "~~~~ GOT A HIT, checking the rest ~~~" << std::endl;
                     for (const extractor::ManeuverOverride &maneuver_relation : overrides)
                     {
-                        std::cout << "Override sequence is ";
+                        util::Log(logDEBUG) << "Override sequence is ";
                         for (auto &n : maneuver_relation.node_sequence)
                         {
-                            std::cout << n << " ";
+                            util::Log(logDEBUG) << n << " ";
                         }
-                        std::cout << std::endl;
-                        std::cout << "Override type is "
+                        util::Log(logDEBUG) << std::endl;
+                        util::Log(logDEBUG) << "Override type is "
                                   << osrm::guidance::internalInstructionTypeToString(
                                          maneuver_relation.override_type)
                                   << std::endl;
-                        std::cout << "Override direction is "
+                        util::Log(logDEBUG) << "Override direction is "
                                   << osrm::guidance::instructionModifierToString(
                                          maneuver_relation.direction)
                                   << std::endl;
 
-                        std::cout << "Route sequence is ";
+                        util::Log(logDEBUG) << "Route sequence is ";
                         for (auto it = current_step_it; it != steps.end(); ++it)
                         {
-                            std::cout << it->from_id << " ";
+                            util::Log(logDEBUG) << it->from_id << " ";
                         }
-                        std::cout << std::endl;
+                        util::Log(logDEBUG) << std::endl;
 
                         auto search_iter = maneuver_relation.node_sequence.begin();
                         auto route_iter = current_step_it;
@@ -215,6 +215,9 @@ class RouteAPI : public BaseAPI
                                 continue;
                             }
                             // Skip over duplicated EBNs in the step array
+                            // EBNs are sometime duplicated because guidance code inserts
+                            // "fake" steps that it later removes.  This hasn't happened yet
+                            // at this point, but we can safely just skip past the dupes.
                             if ((route_iter - 1)->from_id == route_iter->from_id)
                             {
                                 ++route_iter;
@@ -228,7 +231,7 @@ class RouteAPI : public BaseAPI
                         // We got a match, update using the instruction_node
                         if (search_iter == maneuver_relation.node_sequence.end())
                         {
-                            std::cout << "Node sequence matched, looking for the step "
+                            util::Log(logDEBUG) << "Node sequence matched, looking for the step "
                                       << "that has the via node" << std::endl;
                             const auto via_node_coords = BaseAPI::facade.GetCoordinateOfNode(
                                 maneuver_relation.instruction_node);
@@ -237,7 +240,7 @@ class RouteAPI : public BaseAPI
                                 current_step_it,
                                 route_iter,
                                 [&leg_geometry, &via_node_coords](const auto &step) {
-                                    std::cout << "Leg geom from " << step.geometry_begin << " to  "
+                                    util::Log(logDEBUG) << "Leg geom from " << step.geometry_begin << " to  "
                                               << step.geometry_end << std::endl;
 
                                     // iterators over geometry of current step
@@ -250,12 +253,12 @@ class RouteAPI : public BaseAPI
                                         });
                                     if (via_match != end)
                                     {
-                                        std::cout << "Found geometry match at "
+                                        util::Log(logDEBUG) << "Found geometry match at "
                                                   << (std::distance(begin, end) -
                                                       std::distance(via_match, end))
                                                   << std::endl;
                                     }
-                                    std::cout << ((*(leg_geometry.locations.begin() +
+                                    util::Log(logDEBUG) << ((*(leg_geometry.locations.begin() +
                                                      step.geometry_begin) == via_node_coords)
                                                       ? "true"
                                                       : "false")
@@ -269,14 +272,14 @@ class RouteAPI : public BaseAPI
                             if (step_to_update != route_iter)
                             {
                                 // Don't update the last step (it's an arrive instruction)
-                                std::cout << "Updating step "
+                                util::Log(logDEBUG) << "Updating step "
                                           << std::distance(steps.begin(), steps.end()) -
                                                  std::distance(step_to_update, steps.end())
                                           << std::endl;
                                 if (maneuver_relation.override_type !=
                                     osrm::guidance::TurnType::MaxTurnType)
                                 {
-                                    std::cout << "    instruction was "
+                                    util::Log(logDEBUG) << "    instruction was "
                                               << osrm::guidance::internalInstructionTypeToString(
                                                      step_to_update->maneuver.instruction.type)
                                               << " now "
@@ -289,7 +292,7 @@ class RouteAPI : public BaseAPI
                                 if (maneuver_relation.direction !=
                                     osrm::guidance::DirectionModifier::MaxDirectionModifier)
                                 {
-                                    std::cout << "    direction was "
+                                    util::Log(logDEBUG) << "    direction was "
                                               << osrm::guidance::instructionModifierToString(
                                                      step_to_update->maneuver.instruction
                                                          .direction_modifier)
@@ -304,7 +307,7 @@ class RouteAPI : public BaseAPI
                             }
                         }
                     }
-                    std::cout << "Done tweaking steps" << std::endl;
+                    util::Log(logDEBUG) << "Done tweaking steps" << std::endl;
                 }
 
                 /* Perform step-based post-processing.

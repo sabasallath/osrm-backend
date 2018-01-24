@@ -1037,10 +1037,6 @@ void EdgeBasedGraphFactory::GenerateEdgeExpandedEdges(
                 std::for_each(buffer->turn_to_ebn_map.begin(),
                               buffer->turn_to_ebn_map.end(),
                               [&global_turn_to_ebn_map](const auto &p) {
-                                  std::cout << "Copying " << p.first.from << "," << p.first.via
-                                            << "," << p.first.to << " (" << p.second.first << ","
-                                            << p.second.second << ") to the cache list"
-                                            << std::endl;
                                   // TODO: log conflicts here
                                   global_turn_to_ebn_map.insert(p);
                               });
@@ -1074,25 +1070,10 @@ void EdgeBasedGraphFactory::GenerateEdgeExpandedEdges(
                 const auto v = global_turn_to_ebn_map.find(unresolved_override.turn_sequence[i]);
                 if (v != global_turn_to_ebn_map.end())
                 {
-                    std::clog << "Adding pair " << v->second.first << "->" << v->second.second
-                              << std::endl;
                     node_sequence[i] = v->second.first;
                     node_sequence[i + 1] = v->second.second;
                 }
-                else
-                {
-                    std::cout << "Turn " << unresolved_override.turn_sequence[i].from << ","
-                              << unresolved_override.turn_sequence[i].via << ","
-                              << unresolved_override.turn_sequence[i].to
-                              << " not found in our cache list" << std::endl;
-                }
             }
-            std::cout << "Generated node sequence: ";
-            for (const auto &n : node_sequence)
-            {
-                std::cout << " " << n;
-            }
-            std::cout << std::endl;
             storage_override.node_sequence_offset_begin = maneuver_override_sequences.size();
             storage_override.node_sequence_offset_end =
                 maneuver_override_sequences.size() + node_sequence.size();
