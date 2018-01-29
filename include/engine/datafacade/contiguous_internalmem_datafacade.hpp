@@ -919,25 +919,29 @@ class ContiguousInternalMemoryDataFacadeBase : public BaseDataFacade
         // heterogeneous comparison:
         struct Comp
         {
-            bool operator() ( const extractor::StorageManeuverOverride& s, NodeID i ) const { return s.start_node < i; }
-            bool operator() ( NodeID i, const extractor::StorageManeuverOverride& s ) const { return i < s.start_node; }
+            bool operator()(const extractor::StorageManeuverOverride &s, NodeID i) const
+            {
+                return s.start_node < i;
+            }
+            bool operator()(NodeID i, const extractor::StorageManeuverOverride &s) const
+            {
+                return i < s.start_node;
+            }
         };
 
-        auto found_range = std::equal_range(m_maneuver_overrides.begin(), m_maneuver_overrides.end(),
-        edge_based_node_id, Comp{});
+        auto found_range = std::equal_range(
+            m_maneuver_overrides.begin(), m_maneuver_overrides.end(), edge_based_node_id, Comp{});
 
-        std::for_each(found_range.first, found_range.second, [&](const auto &override) {
-                std::vector<NodeID> sequence(m_maneuver_override_node_sequences.begin() +
-                                                 override.node_sequence_offset_begin,
-                                             m_maneuver_override_node_sequences.begin() +
-                                                 override.node_sequence_offset_end);
-                results.push_back(extractor::ManeuverOverride{std::move(sequence),
-                                                              override.instruction_node,
-                                                              override.override_type,
-                                                              override.direction});
+        std::for_each(found_range.first, found_range.second, [&](const auto & override) {
+            std::vector<NodeID> sequence(
+                m_maneuver_override_node_sequences.begin() + override.node_sequence_offset_begin,
+                m_maneuver_override_node_sequences.begin() + override.node_sequence_offset_end);
+            results.push_back(extractor::ManeuverOverride{std::move(sequence),
+                                                          override.instruction_node,
+                                                          override.override_type,
+                                                          override.direction});
         });
         return results;
-
     }
 };
 
